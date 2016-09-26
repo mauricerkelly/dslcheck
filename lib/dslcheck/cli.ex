@@ -37,7 +37,9 @@ defmodule Dslcheck.CLI do
     |> parse_response
   end
 
-  def parse_response({ :ok, body }), do: body
+  def parse_response({ :ok, body }) do
+    Dslcheck.Parser.parse_body(body)
+  end
 
   def parse_response({ :error, error }) do
     IO.puts "Arse, something went wrong: #{error}"
