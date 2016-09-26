@@ -3,9 +3,9 @@ defmodule Dslcheck.BtCheck do
 
   def fetch(house_number, postcode) do
     body = checker_body(house_number, postcode)
-    
+
     checker_url
-    |> HTTPoison.post(body, [], [])
+    |> HTTPoison.post(body, [], [recv_timeout: 10000])
     |> handle_response
   end
 
