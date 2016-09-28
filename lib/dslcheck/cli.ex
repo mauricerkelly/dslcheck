@@ -33,14 +33,15 @@ defmodule Dslcheck.CLI do
   end
 
   def process({house_number, postcode}) do
-    result = Dslcheck.BtCheck.fetch(house_number, postcode)
+    Dslcheck.BtCheck.fetch(house_number, postcode)
     |> parse_response
-
-    print_connection_data(result)
+    |> print_csv_connection_data
   end
 
   def parse_response({ :ok, body }) do
-    Dslcheck.Parser.parse_body(body)
+    connection_data = Dslcheck.Parser.parse_connection_data_from_body(body)
+    cabinet_data = Dslcheck.Parser.parse_cabinet_number_from_body(body)
+    {connection_data, cabinet_data}
   end
 
   def parse_response({ :error, error }) do
@@ -48,8 +49,16 @@ defmodule Dslcheck.CLI do
     System.halt(1)
   end
 
-  def print_connection_data({ down_high, down_low, up_high, up_low}) do
-    IO.puts("Downsteam high: #{down_high}\nDownsteam low:  #{down_low}\nUpsteam high:   #{up_high}\nUpsteam low:    #{up_low}\n")
+  def print_verbose_connection_data({{ down_high, down_low, up_high, up_low}, cabinet}) do
+    IO.puts("Downsteam high: #{down_high}\n" <>
+            "Downsteam low:  #{down_low}\n" <>
+            "Upsteam high:   #{up_high}\n" <>
+            "Upsteam low:    #{up_low}\n" <>
+            "Cabinet:        #{cabinet}")
+  end
+
+  def print_csv_connection_data({{ down_high, down_low, up_high, up_low}, cabinet}) do
+    IO.puts("#{down_high}," <> "#{down_low}," <> "#{up_high}," <> "#{up_low}," <> "#{cabinet}")
   end
 
 end
