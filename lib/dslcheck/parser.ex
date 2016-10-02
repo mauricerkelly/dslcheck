@@ -11,6 +11,10 @@ defmodule Dslcheck.Parser do
     end
   end
 
+  def parse_addresses_from_body(_) do
+    []
+  end
+
   def parse_cabinet_number_from_body(body) do
     body
     |> Floki.find("span span span")
@@ -66,10 +70,6 @@ defmodule Dslcheck.Parser do
     end
   end
 
-  def parse_connection_stats_from_table_row(nil) do
-    { "0", "0", "0", "0" }
-  end
-
   def parse_connection_stats_from_table_row(table_row) do
     downstream_high = extract_value_from_table_row(table_row, 1)
     downstream_low  = extract_value_from_table_row(table_row, 2)
@@ -77,7 +77,5 @@ defmodule Dslcheck.Parser do
     upstream_low    = extract_value_from_table_row(table_row, 4)
     { downstream_high, downstream_low, upstream_high, upstream_low }
   end
-
-
 
 end

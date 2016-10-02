@@ -34,11 +34,18 @@ defmodule Dslcheck.CLI do
 
   def process({house_number, postcode}) do
     Dslcheck.BtCheck.fetch(house_number, postcode)
-    |> parse_response
+    |> parse_response(house_number)
     |> print_csv_connection_data
   end
 
-  def parse_response({ :ok, body }) do
+  def parse_response({ :ok, body } = response, "") do
+    addresses = Dslcheck.Parser.parse_addresses_from_body(body)
+    Enum.map addresses, fn(address) ->
+      parse_response(response, address)
+    end
+  end
+
+  def parse_response({ :ok, body }, _) do
     connection_data = Dslcheck.Parser.parse_connection_data_from_body(body)
     cabinet_data = Dslcheck.Parser.parse_cabinet_number_from_body(body)
     {connection_data, cabinet_data}
