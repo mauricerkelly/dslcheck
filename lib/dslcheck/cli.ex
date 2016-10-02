@@ -57,6 +57,10 @@ defmodule Dslcheck.CLI do
             "Cabinet:        #{cabinet}")
   end
 
+  def print_verbose_connection_data(nil) do
+    IO.puts("Unable to get a result")
+  end
+
   def print_csv_connection_data({{ down_high, down_low, up_high, up_low}, cabinet}) do
     IO.puts("#{down_high}," <> "#{down_low}," <> "#{up_high}," <> "#{up_low}," <> "#{cabinet}")
   end
