@@ -1,8 +1,14 @@
 defmodule Dslcheck.Parser do
 
   def parse_connection_data_from_body(body) do
-    parse_table_row_from_body(body)
-    |> parse_connection_stats_from_table_row
+    table_row = parse_table_row_from_body(body)
+
+    case table_row do
+      nil ->
+        { "0", "0", "0", "0" }
+      table_row ->
+        parse_connection_stats_from_table_row(table_row)
+    end
   end
 
   def parse_cabinet_number_from_body(body) do
@@ -65,16 +71,11 @@ defmodule Dslcheck.Parser do
   end
 
   def parse_connection_stats_from_table_row(table_row) do
-    case table_row do
-      table_row when table_row == nil ->
-        { "0", "0", "0", "0" }
-      table_row ->
-        downstream_high = extract_value_from_table_row(table_row, 1)
-        downstream_low  = extract_value_from_table_row(table_row, 2)
-        upstream_high   = extract_value_from_table_row(table_row, 3)
-        upstream_low    = extract_value_from_table_row(table_row, 4)
-        { downstream_high, downstream_low, upstream_high, upstream_low }
-    end
+    downstream_high = extract_value_from_table_row(table_row, 1)
+    downstream_low  = extract_value_from_table_row(table_row, 2)
+    upstream_high   = extract_value_from_table_row(table_row, 3)
+    upstream_low    = extract_value_from_table_row(table_row, 4)
+    { downstream_high, downstream_low, upstream_high, upstream_low }
   end
 
 
