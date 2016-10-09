@@ -2,11 +2,16 @@ defmodule Dslcheck.BtCheck do
   @user_agent   [ {"User-agent", "Elixir dslcheck@chatswood.org.uk"} ]
 
   def fetch(house_number, postcode) do
-    body = checker_body(house_number, postcode)
-
     checker_url
-    |> HTTPoison.post(body, [], [recv_timeout: 10000])
+    |> HTTPoison.post(checker_body(house_number, postcode), [], [recv_timeout: 10000])
     |> handle_response
+  end
+
+  def fetch_data_from_file(filename) do
+    case File.read(filename) do
+      { :ok, contents } -> contents
+      _ -> ""
+    end
   end
 
   defp checker_url do

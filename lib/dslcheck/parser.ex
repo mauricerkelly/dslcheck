@@ -11,10 +11,6 @@ defmodule Dslcheck.Parser do
     end
   end
 
-  def parse_addresses_from_body(_) do
-    []
-  end
-
   def parse_cabinet_number_from_body(body) do
     body
     |> Floki.find("span span span")

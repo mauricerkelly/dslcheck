@@ -39,7 +39,7 @@ defmodule Dslcheck.CLI do
   end
 
   def parse_response({ :ok, body } = response, "") do
-    addresses = Dslcheck.Parser.parse_addresses_from_body(body)
+    addresses = Dslcheck.Parser.Address.parse_addresses_from_body(body)
     Enum.map addresses, fn(address) ->
       parse_response(response, address)
     end
