@@ -5,10 +5,16 @@ defmodule Dslcheck.Mixfile do
     [app: :dslcheck,
      escript: escript_config,
      version: "0.1.0",
+     name: "DSL Check",
+     source_url: "https://github.com/mauricerkelly/dslcheck",
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps()]
+     deps: deps(),
+     description: """
+     A module to query dslchecker.bt.com for VDSL status at a specified
+     property number, address or telephone number.
+     """]
   end
 
   # Configuration for the OTP application
