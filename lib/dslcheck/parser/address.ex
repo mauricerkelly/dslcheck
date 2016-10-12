@@ -19,11 +19,11 @@ defmodule Dslcheck.Parser.Address do
     # ||56A|BALLYNAHINCH RD|DROMARA|DROMORE|BT25 2AL|NI|A00003682123||185969666
     components = String.split(address_data, "|")
     house_number = Enum.at(components, 2)
-    road_address = Enum.at(components, 3)
+    street_address = Enum.at(components, 3)
     post_code = Enum.at(components, 6)
     urpn = List.last(components)
 
-    { "#{house_number} #{road_address}, #{post_code}", urpn}
+    { house_number, street_address, post_code, urpn}
   end
 
 end

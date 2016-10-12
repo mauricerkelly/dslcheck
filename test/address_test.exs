@@ -26,9 +26,11 @@ defmodule AddressTest do
   end
 
   test "the address and urpn are extracted from the address data string" do
-    {address, urpn} = extract_address_and_urpn_from_address_data(@address_data)
+    {house_number, street_name, postcode, urpn} = extract_address_and_urpn_from_address_data(@address_data)
 
-    assert address == "56A BALLYNAHINCH RD, BT25 2AL"
+    assert house_number == "56A"
+    assert street_name == "BALLYNAHINCH RD"
+    assert postcode == "BT25 2AL"
     assert urpn == "185969666"
   end
 
