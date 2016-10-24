@@ -13,13 +13,35 @@ defmodule Dslcheck.CLI do
   """
   def parse_args(argv) do
     Logger.debug("Parsing the command line options")
-    parse = OptionParser.parse(argv, switches: [ help: :boolean, housenumber: :string, postcode: :string], aliases: [ h: :help ])
+
+    switches = [ 
+      help: :boolean,
+      housenumber: :string,
+      postcode: :string,
+      debug: :boolean
+    ]
+
+    parse = OptionParser.parse(argv, switches: switches, aliases: [ h: :help ])
     case parse do
     { [ help: true ], _, _ }
       -> :help
-    { [housenumber: housenumber, postcode: postcode], _, _ }
+    { options, _, _ }
+      -> parse_options options
+    end
+  end
+
+  def parse_options(options) do
+    debug = Keyword.get(options, :debug, false)
+    if (debug) do
+      Logger.configure( level: :debug)
+    end
+
+    options = Keyword.drop(options, [:debug])
+
+    case options do
+    [housenumber: housenumber, postcode: postcode]
       -> %{ housenumber: housenumber, postcode: postcode }
-    { [postcode: postcode], _, _}
+    [postcode: postcode]
       -> %{ postcode: postcode }
     _ -> :help
     end
