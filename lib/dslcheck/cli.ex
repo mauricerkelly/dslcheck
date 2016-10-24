@@ -1,9 +1,6 @@
 defmodule Dslcheck.CLI do
-  @moduledoc """
-  Handle the command line parsing and the dispatch to
-  the various functions that end up generating a
-  table of the last _n_ issues in a github project
-  """
+  require(Logger)
+
   def main(argv) do
     argv
     |> parse_args
@@ -15,40 +12,53 @@ defmodule Dslcheck.CLI do
 
   """
   def parse_args(argv) do
-    parse = OptionParser.parse(argv, switches: [ help: :boolean], aliases: [ h: :help ])
+    Logger.debug("Parsing the command line options")
+    parse = OptionParser.parse(argv, switches: [ help: :boolean, housenumber: :string, postcode: :string], aliases: [ h: :help ])
     case parse do
     { [ help: true ], _, _ }
       -> :help
-    { _, [ house_number, postcode ], _ }
-      -> { house_number, postcode }
+    { [housenumber: housenumber, postcode: postcode], _, _ }
+      -> %{ housenumber: housenumber, postcode: postcode }
+    { [postcode: postcode], _, _}
+      -> %{ postcode: postcode }
     _ -> :help
     end
   end
 
   def process(:help) do
     IO.puts """
-      usage: dslcheck house_number postcode
+      usage: dslcheck --housenumber housenumber --postcode postcode
     """
     System.halt(0)
   end
 
-  def process({house_number, postcode}) do
-    Dslcheck.BtCheck.fetch(house_number, postcode)
-    |> parse_response(house_number)
+  def process(%{housenumber: housenumber, postcode: postcode}) do
+    Dslcheck.BtCheck.fetch(housenumber, postcode)
+    |> parse_response(housenumber)
     |> print_csv_connection_data
   end
 
-  def parse_response({ :ok, body } = response, "") do
+  def process(%{postcode: postcode}) do
+    Logger.debug("Processing postcode only input: #{postcode}")
+    Dslcheck.BtCheck.fetch("", postcode)
+    |> parse_response("")
+  end
+
+  def parse_response({ :ok, body }, "") do
     addresses = Dslcheck.Parser.Address.parse_addresses_from_body(body)
     Enum.map addresses, fn(address) ->
-      parse_response(response, address)
+      case address do
+        {:ok, housenumber, street_name, postcode, _} ->
+          process %{housenumber: housenumber, postcode: postcode}
+        {:error, raw_address} -> nil
+      end
     end
   end
 
-  def parse_response({ :ok, body }, _) do
+  def parse_response({ :ok, body }, housenumber) do
     connection_data = Dslcheck.Parser.parse_connection_data_from_body(body)
     cabinet_data = Dslcheck.Parser.parse_cabinet_number_from_body(body)
-    {connection_data, cabinet_data}
+    {housenumber, connection_data, cabinet_data}
   end
 
   def parse_response({ :error, error }) do
@@ -68,8 +78,8 @@ defmodule Dslcheck.CLI do
     IO.puts("Unable to get a result")
   end
 
-  def print_csv_connection_data({{ down_high, down_low, up_high, up_low}, cabinet}) do
-    IO.puts("#{down_high}," <> "#{down_low}," <> "#{up_high}," <> "#{up_low}," <> "#{cabinet}")
+  def print_csv_connection_data({housenumber, { down_high, down_low, up_high, up_low}, cabinet}) do
+    IO.puts("#{housenumber}," <> "#{down_high}," <> "#{down_low}," <> "#{up_high}," <> "#{up_low}," <> "#{cabinet}")
   end
 
 end

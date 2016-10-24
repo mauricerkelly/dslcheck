@@ -8,8 +8,11 @@ defmodule CliTest do
     assert parse_args(["--help", "anything"]) == :help
   end
 
-  test "two values returned if two given" do
-    assert parse_args(["97", "BT25 2AL"]) == { "97", "BT25 2AL" }
+  test "two values returned if --housenumber and --postcode given" do
+    assert parse_args(["--housenumber", "97", "--postcode", "BT25 2AL"]) == %{ housenumber: "97", postcode: "BT25 2AL" }
   end
+
+
+
 
 end
